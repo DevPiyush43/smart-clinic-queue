@@ -46,7 +46,7 @@ const HomeScreen = () => {
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
               <div style={{ width: '42px', height: '42px', background: '#3B82F6', borderRadius: '13px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px', flexShrink: 0 }}>🏥</div>
               <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontSize: '15px', fontWeight: '700', color: '#fff' }}>Dr Sharma Clinic</div>
+                <div style={{ fontSize: '15px', fontWeight: '700', color: '#fff' }}>Smart Clinic</div>
                 <div style={{ fontSize: '11px', color: '#64748b' }}>📍 Nashik, Maharashtra</div>
               </div>
               <div style={{ background: '#10B981', borderRadius: '20px', padding: '4px 11px', fontSize: '10px', fontWeight: '800', color: '#fff', flexShrink: 0 }}>OPEN</div>

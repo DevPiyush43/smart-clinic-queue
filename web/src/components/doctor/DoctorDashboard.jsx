@@ -131,7 +131,7 @@ const DoctorDashboard = () => {
       <div style={{ background: '#0B1120', display: 'flex', alignItems: 'center', padding: '12px 18px', gap: '12px', boxShadow: '0 2px 12px rgba(0,0,0,0.2)', flexShrink: 0 }}>
         <div style={{ width: '40px', height: '40px', background: '#3B82F6', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '18px', flexShrink: 0 }}>🩺</div>
         <div style={{ flex: 1 }}>
-          <div style={{ fontSize: '14px', fontWeight: '800', color: '#fff' }}>Dr Sharma Clinic</div>
+          <div style={{ fontSize: '14px', fontWeight: '800', color: '#fff' }}>Smart Clinic</div>
           <div style={{ fontSize: '11px', color: '#475569' }}>Doctor Dashboard</div>
         </div>
         <div className="live-badge"><div className="live-dot" />LIVE</div>
@@ -322,8 +322,8 @@ const DoctorDashboard = () => {
           <div style={{ maxWidth: '500px', margin: '0 auto' }}>
             <div style={{ background: '#fff', borderRadius: '18px', border: '1px solid #E2E8F0', overflow: 'hidden' }}>
               {[
-                { icon: '🏥', label: 'Clinic Name', value: 'Dr Sharma Clinic' },
-                { icon: '👨‍⚕️', label: 'Doctor', value: `Dr. ${user?.name || 'Sharma'}` },
+                { icon: '🏥', label: 'Clinic Name', value: 'Smart Clinic' },
+                { icon: '👨‍⚕️', label: 'Doctor', value: `Dr. ${user?.name || 'Doctor'}` },
                 { icon: '📍', label: 'Location', value: 'Nashik, Maharashtra' },
                 { icon: '📱', label: 'Phone', value: '+91 9000000000' },
                 { icon: '⏱️', label: 'Avg. Time/Patient', value: '5 minutes' },

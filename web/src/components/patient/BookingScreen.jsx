@@ -54,7 +54,7 @@ const BookingScreen = () => {
   if (myToken && ['waiting', 'next', 'serving'].includes(myToken.status)) {
     const qrValue = myToken.qrData || JSON.stringify({
       displayToken: myToken.displayToken || `#${myToken.tokenNumber}`,
-      clinicName: 'Dr Sharma Clinic',
+      clinicName: 'Smart Clinic',
       date: formatDate(myToken.bookedAt),
       patientName: user?.name,
     });
@@ -80,7 +80,7 @@ const BookingScreen = () => {
               {myToken.displayToken || `#${myToken.tokenNumber}`}
             </div>
             <div style={{ fontSize: '13px', color: 'rgba(255,255,255,0.75)', marginTop: '6px' }}>
-              Dr Sharma Clinic · {formatDate(myToken.bookedAt)}
+              Smart Clinic · {formatDate(myToken.bookedAt)}
             </div>
             <div style={{ marginTop: '14px', background: 'rgba(255,255,255,0.2)', borderRadius: '20px', padding: '6px 16px', display: 'inline-block', fontSize: '12px', fontWeight: '700', color: '#fff' }}>
               ✅ Booking Confirmed
@@ -100,7 +100,7 @@ const BookingScreen = () => {
             {[
               ['Patient', user?.name || '—'],
               ['Token', myToken.displayToken || `#${myToken.tokenNumber}`],
-              ['Doctor', 'Dr. R. Sharma'],
+              ['Doctor', 'Doctor on Duty'],
               ['Date', formatDate(myToken.bookedAt)],
             ].map(([k, v]) => (
               <div key={k} style={{ display: 'flex', justifyContent: 'space-between', padding: '9px 0', borderBottom: '1px solid #F8FAFC' }}>
@@ -195,7 +195,7 @@ const BookingScreen = () => {
       <div className="scroll-area" style={{ flex: 1, padding: '0 16px' }}>
         <div style={{ background: '#3B82F6', borderRadius: '20px', padding: '20px', textAlign: 'center', marginBottom: '20px' }}>
           <div style={{ fontSize: '28px', marginBottom: '8px' }}>🏥</div>
-          <div style={{ fontSize: '16px', fontWeight: '800', color: '#fff' }}>Dr Sharma Clinic</div>
+          <div style={{ fontSize: '16px', fontWeight: '800', color: '#fff' }}>Smart Clinic</div>
           <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.8)', marginTop: '2px' }}>Nashik · Now Serving: #{currentToken || '—'}</div>
           <div style={{ marginTop: '8px', background: 'rgba(255,255,255,0.15)', borderRadius: '20px', padding: '3px 10px', display: 'inline-block', fontSize: '11px', fontWeight: '700', color: '#fff' }}>
             {queueLength} in queue · ~{queueLength * 5} min wait

@@ -53,7 +53,7 @@ const LoginScreen = () => {
         {/* Clinic Card */}
         <div style={{ background: '#3B82F6', borderRadius: '20px', padding: '22px', textAlign: 'center', marginBottom: '22px' }}>
           <div style={{ fontSize: '32px', marginBottom: '8px' }}>🏥</div>
-          <div style={{ fontSize: '18px', fontWeight: '800', color: '#fff', marginBottom: '3px' }}>Dr Sharma Clinic</div>
+          <div style={{ fontSize: '18px', fontWeight: '800', color: '#fff', marginBottom: '3px' }}>Smart Clinic</div>
           <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.8)' }}>Nashik · Mon–Sat · 9:00am – 6:00pm</div>
           <div style={{ marginTop: '10px', background: 'rgba(255,255,255,0.15)', borderRadius: '20px', padding: '4px 12px', display: 'inline-block', fontSize: '11px', fontWeight: '700', color: '#fff' }}>
             🟢 Open Now
