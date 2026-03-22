@@ -1,0 +1,19 @@
+{
+  "name": "smart-clinic-queue",
+  "version": "2.0.0",
+  "private": true,
+  "description": "Smart Clinic Queue — MERN + React Native monorepo",
+  "scripts": {
+    "dev": "concurrently \"npm run server\" \"npm run web\"",
+    "server": "cd server && npm run dev",
+    "web": "cd web && npm run dev",
+    "mobile": "cd mobile && npx expo start",
+    "mobile:android": "cd mobile && npx expo run:android",
+    "install:all": "cd server && npm i && cd ../web && npm i",
+    "seed": "cd server && node seed.js",
+    "build:web": "cd web && npm run build"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.0"
+  }
+}

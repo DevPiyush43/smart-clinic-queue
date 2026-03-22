@@ -1,0 +1,261 @@
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── CSS CUSTOM PROPERTIES ── */
+:root {
+  --brand-blue: #3B82F6;
+  --brand-dark: #0B1120;
+  --brand-mid: #0F2448;
+  --brand-cyan: #06B6D4;
+  --brand-green: #10B981;
+  --brand-amber: #F59E0B;
+  --brand-red: #EF4444;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  background: #0B1120;
+  min-height: 100vh;
+  color: #0f172a;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── PATIENT APP SHELL — 430px centered ── */
+.patient-shell {
+  width: 100%;
+  max-width: 430px;
+  min-height: 100vh;
+  margin: 0 auto;
+  background: #F8FAFC;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* ── SHARED SCROLL ── */
+.scroll-area {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+
+.scroll-area::-webkit-scrollbar {
+  display: none;
+}
+
+/* ── CARD ── */
+.card {
+  background: white;
+  border-radius: 20px;
+  border: 1px solid #E2E8F0;
+  padding: 18px;
+}
+
+/* ── STATUS BADGES ── */
+.badge-waiting { background: #FEF3C7; color: #D97706; }
+.badge-next    { background: #DBEAFE; color: #1D4ED8; }
+.badge-serving { background: #3B82F6; color: #ffffff; }
+.badge-done    { background: #DCFCE7; color: #15803D; }
+.badge-skipped { background: #FCE7F3; color: #9D174D; }
+.badge-cancelled { background: #F3F4F6; color: #6B7280; }
+
+/* ── PROGRESS BAR ── */
+.progress-track {
+  height: 10px;
+  background: #E2E8F0;
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #3B82F6, #06B6D4);
+  border-radius: 20px;
+  transition: width 0.9s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ── OTP INPUT ── */
+.otp-box {
+  width: 58px;
+  height: 64px;
+  border: 2.5px solid #E2E8F0;
+  border-radius: 16px;
+  font-size: 24px;
+  font-weight: 800;
+  text-align: center;
+  color: #0f172a;
+  background: white;
+  outline: none;
+  transition: all 0.2s;
+  font-family: 'Nunito', sans-serif;
+  font-variant-numeric: tabular-nums;
+}
+
+.otp-box:focus {
+  border-color: #3B82F6;
+  background: #EFF6FF;
+}
+
+.otp-box.filled {
+  border-color: #10B981;
+  background: #ECFDF5;
+}
+
+/* ── LIVE BADGE ── */
+.live-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: 20px;
+  padding: 3px 10px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #EF4444;
+}
+
+.live-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #EF4444;
+  animation: pulse-dot 1.5s infinite;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(0.8); }
+}
+
+/* ── TOGGLE SWITCH ── */
+.toggle-switch {
+  --w: 44px;
+  --h: 24px;
+  --dot: 18px;
+  width: var(--w);
+  height: var(--h);
+  border-radius: 20px;
+  background: #E2E8F0;
+  border: none;
+  cursor: pointer;
+  position: relative;
+  transition: background 0.2s;
+  flex-shrink: 0;
+}
+
+.toggle-switch.on { background: #3B82F6; }
+
+.toggle-switch::after {
+  content: '';
+  position: absolute;
+  width: var(--dot);
+  height: var(--dot);
+  border-radius: 50%;
+  background: white;
+  top: 3px;
+  left: 3px;
+  transition: left 0.2s;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+}
+
+.toggle-switch.on::after { left: calc(var(--w) - var(--dot) - 3px); }
+
+/* ── DOCTOR DASHBOARD ── */
+.doc-main::-webkit-scrollbar {
+  width: 4px;
+}
+
+.doc-main::-webkit-scrollbar-thumb {
+  background: #E2E8F0;
+  border-radius: 4px;
+}
+
+/* ── ANIMATIONS ── */
+@keyframes slideLeft {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes slideRight {
+  from { transform: translateX(-40px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes fadeUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.slide-left  { animation: slideLeft 0.28s cubic-bezier(0.4,0,0.2,1); }
+.slide-right { animation: slideRight 0.28s cubic-bezier(0.4,0,0.2,1); }
+.fade-up     { animation: fadeUp 0.3s ease; }
+
+/* ── OFFLINE BANNER ── */
+.offline-banner {
+  position: fixed;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 430px;
+  background: #F59E0B;
+  color: white;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 8px;
+  z-index: 9999;
+}
+
+/* ── LOADING SKELETON ── */
+@keyframes shimmer {
+  0% { background-position: -200px 0; }
+  100% { background-position: calc(200px + 100%) 0; }
+}
+
+.skeleton {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200px 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 8px;
+}
+
+/* ── DOCTOR STAT BOX HOVER ── */
+.dstat:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  transition: all 0.2s;
+}
+
+/* ── RESPONSIVE — Doctor dashboard full width on desktop ── */
+@media (min-width: 768px) {
+  .doctor-layout {
+    max-width: 100%;
+  }
+}
+
+/* ── POSTCSS ── */
+@layer utilities {
+  .font-nunito { font-family: 'Nunito', sans-serif; }
+  .tabular-nums { font-variant-numeric: tabular-nums; }
+  .scrollbar-none::-webkit-scrollbar { display: none; }
+}
