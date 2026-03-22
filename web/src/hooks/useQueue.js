@@ -3,7 +3,7 @@ import api from '../api/axios';
 import useQueueStore from '../store/queueStore';
 import toast from 'react-hot-toast';
 
-const CLINIC_ID = import.meta.env.VITE_CLINIC_ID;
+const CLINIC_ID = import.meta.env.VITE_CLINIC_ID || '69c05cdad14e24fd7cf02dec';
 
 const useQueue = (clinicId) => {
   const store = useQueueStore();

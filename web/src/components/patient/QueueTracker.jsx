@@ -6,7 +6,7 @@ import QueueRow from '../shared/QueueRow';
 import BottomNav from '../shared/BottomNav';
 import { calcProgress, positionMessage, waitDisplay, maskName } from '../../utils/helpers';
 
-const CLINIC_ID = import.meta.env.VITE_CLINIC_ID || '';
+const CLINIC_ID = import.meta.env.VITE_CLINIC_ID || '69c05cdad14e24fd7cf02dec';
 
 const QueueTracker = () => {
   const navigate = useNavigate();

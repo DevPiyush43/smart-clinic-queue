@@ -10,7 +10,7 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell
 } from 'recharts';
 
-const CLINIC_ID = import.meta.env.VITE_CLINIC_ID || '';
+const CLINIC_ID = import.meta.env.VITE_CLINIC_ID || '69c05cdad14e24fd7cf02dec';
 
 // ── Tab definitions ────────────────────────────────────────────────────
 const TABS = [

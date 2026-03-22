@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import useAuth from '../../hooks/useAuth';
 import toast from 'react-hot-toast';
 
-const CLINIC_ID = import.meta.env.VITE_CLINIC_ID || '';
+const CLINIC_ID = import.meta.env.VITE_CLINIC_ID || '69c05cdad14e24fd7cf02dec';
 
 const LoginScreen = () => {
   const navigate = useNavigate();

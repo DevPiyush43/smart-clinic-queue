@@ -8,7 +8,7 @@ import StatBox from '../shared/StatBox';
 import BottomNav from '../shared/BottomNav';
 import { getGreeting, maskName, waitDisplay, calcProgress } from '../../utils/helpers';
 
-const CLINIC_ID = import.meta.env.VITE_CLINIC_ID || '';
+const CLINIC_ID = import.meta.env.VITE_CLINIC_ID || '69c05cdad14e24fd7cf02dec';
 
 const HomeScreen = () => {
   const navigate = useNavigate();
