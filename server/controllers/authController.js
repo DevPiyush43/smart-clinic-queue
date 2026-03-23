@@ -3,7 +3,7 @@ const { validationResult } = require('express-validator');
 const User = require('../models/User');
 const generateToken = require('../utils/generateToken');
 const generateOtp = require('../utils/generateOtp');
-const { sendOtp } = require('../services/smsService');
+const { sendOtp } = require('../services/whatsappService');
 
 // ─── POST /api/auth/send-otp ───────────────────────────────────────────────
 const sendOtpHandler = async (req, res) => {
@@ -51,7 +51,7 @@ const sendOtpHandler = async (req, res) => {
     });
   }
 
-  // Production: send via SMS
+  // Production: send via WhatsApp
   await sendOtp(phone, otp, countryCode);
 
   return res.json({
