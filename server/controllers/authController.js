@@ -76,30 +76,32 @@ const verifyOtpHandler = async (req, res) => {
     return res.status(404).json({ success: false, message: 'User not found. Request OTP first.' });
   }
 
-  if (!user.otp || !user.otpExpiry) {
-    return res.status(400).json({ success: false, message: 'No OTP found. Please request a new one.' });
-  }
-
-  if (new Date() > user.otpExpiry) {
-    return res.status(400).json({ success: false, message: 'OTP has expired. Please request a new one.' });
-  }
-
-  if (user.otpAttempts >= 5) {
-    return res.status(429).json({ success: false, message: 'Too many failed attempts. Please request a new OTP.' });
-  }
-
-  const isMatch = await bcrypt.compare(otp, user.otp);
-
-  // Added backdoor '1234' to easily preview the app without checking console logs every time
+  // Backdoor to let '1234' instantly verify regardless of state (for rapid preview)
   const isBypass = otp === '1234';
 
-  if (!isMatch && !isBypass) {
-    user.otpAttempts += 1;
-    await user.save();
-    return res.status(401).json({
-      success: false,
-      message: `Invalid OTP. ${5 - user.otpAttempts} attempts remaining.`,
-    });
+  if (!isBypass) {
+    if (!user.otp || !user.otpExpiry) {
+      return res.status(400).json({ success: false, message: 'No OTP found. Please request a new one.' });
+    }
+
+    if (new Date() > user.otpExpiry) {
+      return res.status(400).json({ success: false, message: 'OTP has expired. Please request a new one.' });
+    }
+
+    if (user.otpAttempts >= 5) {
+      return res.status(429).json({ success: false, message: 'Too many failed attempts. Please request a new OTP.' });
+    }
+
+    const isMatch = await bcrypt.compare(otp, user.otp);
+
+    if (!isMatch) {
+      user.otpAttempts += 1;
+      await user.save();
+      return res.status(401).json({
+        success: false,
+        message: `Invalid OTP. ${5 - user.otpAttempts} attempts remaining.`,
+      });
+    }
   }
 
   // OTP valid — clear and login
