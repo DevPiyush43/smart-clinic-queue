@@ -6,6 +6,7 @@ const {
   callNext,
   skipPatient,
   completeToken,
+  scanQrComplete,
   cancelToken,
   closeSession,
   toggleAccepting,
@@ -27,6 +28,9 @@ router.post('/skip', protect, authorize('doctor'), skipPatient);
 
 // POST /api/queue/complete (doctor only)
 router.post('/complete', protect, authorize('doctor'), completeToken);
+
+// POST /api/queue/scan-qr (doctor only) — marks serving token done via QR scan
+router.post('/scan-qr', protect, authorize('doctor'), scanQrComplete);
 
 // POST /api/queue/cancel (patient only — own token)
 router.post('/cancel', protect, authorize('patient'), cancelToken);

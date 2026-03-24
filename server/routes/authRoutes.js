@@ -1,5 +1,5 @@
 const express = require('express');
-const { body } = require('express-validator');
+const { body, oneOf } = require('express-validator');
 const router = express.Router();
 
 const {
@@ -15,17 +15,20 @@ const {
 const { protect } = require('../middleware/authMiddleware');
 const { otpLimiter } = require('../middleware/rateLimiter');
 
-// POST /api/auth/send-otp
+// POST /api/auth/send-otp  (accepts email OR phone)
 router.post(
   '/send-otp',
   otpLimiter,
   [
-    body('phone')
-      .trim()
-      .isLength({ min: 10, max: 10 })
-      .withMessage('Phone must be exactly 10 digits')
-      .isNumeric()
-      .withMessage('Phone must contain only digits'),
+    oneOf([
+      body('email').trim().isEmail().withMessage('Valid email is required'),
+      body('phone')
+        .trim()
+        .isLength({ min: 10, max: 10 })
+        .withMessage('Phone must be exactly 10 digits')
+        .isNumeric()
+        .withMessage('Phone must contain only digits'),
+    ], { message: 'Email or 10-digit phone number is required.' }),
   ],
   sendOtpHandler
 );
@@ -34,8 +37,11 @@ router.post(
 router.post(
   '/verify-otp',
   [
-    body('phone').trim().isLength({ min: 10, max: 10 }).withMessage('Invalid phone'),
-    body('otp').trim().isLength({ min: 4, max: 4 }).withMessage('OTP must be 4 digits'),
+    oneOf([
+      body('email').trim().isEmail(),
+      body('phone').trim().isLength({ min: 10, max: 10 }).isNumeric(),
+    ], { message: 'Email or phone is required.' }),
+    body('otp').trim().isLength({ min: 4, max: 6 }).withMessage('OTP must be 4–6 digits'),
   ],
   verifyOtpHandler
 );

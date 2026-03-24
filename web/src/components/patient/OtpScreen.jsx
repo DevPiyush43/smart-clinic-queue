@@ -7,8 +7,8 @@ import toast from 'react-hot-toast';
 const OtpScreen = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { verifyOtp } = useAuth();
-  const { phone, devOtp } = location.state || {};
+  const { verifyOtp, sendOtp } = useAuth();
+  const { contact, method, devOtp } = location.state || {};
   const [otp, setOtp] = useState(['', '', '', '']);
   const [loading, setLoading] = useState(false);
   const [countdown, setCountdown] = useState(30);
@@ -16,7 +16,7 @@ const OtpScreen = () => {
   const refs = [useRef(), useRef(), useRef(), useRef()];
 
   useEffect(() => {
-    if (!phone) navigate('/login', { replace: true });
+    if (!contact) navigate('/login', { replace: true });
     refs[0].current?.focus();
   }, []);
 
@@ -28,6 +28,13 @@ const OtpScreen = () => {
       setCanResend(true);
     }
   }, [countdown]);
+
+  // Auto-fill in dev mode
+  useEffect(() => {
+    if (devOtp) {
+      toast('Dev mode – OTP auto-filled: ' + devOtp, { icon: '🔑' });
+    }
+  }, []);
 
   const handleChange = (val, idx) => {
     if (!/^\d?$/.test(val)) return;
@@ -49,8 +56,8 @@ const OtpScreen = () => {
   const verify = useCallback(async (code) => {
     setLoading(true);
     try {
-      await verifyOtp(phone, code);
-      toast.success('Welcome back! 🎉');
+      await verifyOtp(contact, code);
+      toast.success('Welcome! 🎉');
       navigate('/home', { replace: true });
     } catch (err) {
       const msg = err?.response?.data?.message || 'Invalid OTP';
@@ -60,20 +67,32 @@ const OtpScreen = () => {
     } finally {
       setLoading(false);
     }
-  }, [phone, verifyOtp, navigate]);
+  }, [contact, verifyOtp, navigate]);
 
   const handleVerify = () => {
     const code = otp.join('');
     if (code.length === 4) verify(code);
   };
 
-  const handleResend = () => {
+  const handleResend = async () => {
     setCountdown(30);
     setCanResend(false);
-    toast.success('OTP resent!');
+    try {
+      await sendOtp(contact);
+      toast.success('OTP resent!');
+    } catch (err) {
+      toast.error('Failed to resend OTP');
+    }
   };
 
-  const maskedPhone = phone ? `+91 XXXXXX${phone.slice(-4)}` : '';
+  // Mask display
+  const isEmailContact = contact?.includes('@');
+  const maskedContact = isEmailContact
+    ? contact?.replace(/(.{2}).*(@.*)/, '$1***$2')
+    : contact ? `+91 XXXXXX${contact.slice(-4)}` : '';
+
+  const icon = isEmailContact ? '📧' : '📲';
+  const label = isEmailContact ? 'Check your Email' : 'Check your SMS';
 
   return (
     <motion.div
@@ -89,10 +108,15 @@ const OtpScreen = () => {
       </div>
 
       <div style={{ padding: '20px 16px', textAlign: 'center' }}>
-        <div style={{ fontSize: '52px', marginBottom: '12px' }}>📲</div>
-        <div style={{ fontSize: '18px', fontWeight: '800', color: '#0f172a', marginBottom: '6px' }}>Check your SMS</div>
+        <div style={{ fontSize: '52px', marginBottom: '12px' }}>{icon}</div>
+        <div style={{ fontSize: '18px', fontWeight: '800', color: '#0f172a', marginBottom: '6px' }}>{label}</div>
         <div style={{ fontSize: '13px', color: '#64748b', lineHeight: 1.5, marginBottom: '28px' }}>
-          OTP sent to <strong>{maskedPhone}</strong>
+          OTP sent to <strong>{maskedContact}</strong>
+          {isEmailContact && (
+            <div style={{ marginTop: '4px', color: '#94a3b8', fontSize: '12px' }}>
+              Check your spam folder if not received
+            </div>
+          )}
         </div>
 
         {/* OTP boxes */}
@@ -117,7 +141,7 @@ const OtpScreen = () => {
 
         <div style={{ fontSize: '12px', color: '#64748b', marginBottom: '24px' }}>
           {canResend ? (
-            <span onClick={handleResend} style={{ color: '#3B82F6', fontWeight: '700', cursor: 'pointer' }}>Resend OTP</span>
+            <span onClick={handleResend} style={{ color: '#3B82F6', fontWeight: '700', cursor: 'pointer' }}>↺ Resend OTP</span>
           ) : (
             <>Resend in <span style={{ fontWeight: '700' }}>{countdown}s</span></>
           )}

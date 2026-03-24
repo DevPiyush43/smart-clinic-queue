@@ -5,13 +5,19 @@ import toast from 'react-hot-toast';
 const useAuth = () => {
   const store = useAuthStore();
 
-  const sendOtp = async (phone) => {
-    const res = await api.post('/auth/send-otp', { phone });
+  // Send OTP — accepts email (preferred) or phone
+  const sendOtp = async (contact) => {
+    const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contact);
+    const payload = isEmail ? { email: contact } : { phone: contact };
+    const res = await api.post('/auth/send-otp', payload);
     return res.data;
   };
 
-  const verifyOtp = async (phone, otp) => {
-    const res = await api.post('/auth/verify-otp', { phone, otp });
+  // Verify OTP — pass the same contact (email or phone) used for send
+  const verifyOtp = async (contact, otp) => {
+    const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contact);
+    const payload = isEmail ? { email: contact, otp } : { phone: contact, otp };
+    const res = await api.post('/auth/verify-otp', payload);
     const { token, user } = res.data;
     store.login(user, token);
     return res.data;

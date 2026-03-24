@@ -3,7 +3,10 @@ const { validationResult } = require('express-validator');
 const User = require('../models/User');
 const generateToken = require('../utils/generateToken');
 const generateOtp = require('../utils/generateOtp');
-const { sendOtp } = require('../services/whatsappService');
+const { sendOtpEmail } = require('../services/emailService');
+
+// ─── Helper: determine contact type ──────────────────────────────────────
+const isEmail = (val) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val);
 
 // ─── POST /api/auth/send-otp ───────────────────────────────────────────────
 const sendOtpHandler = async (req, res) => {
@@ -12,20 +15,41 @@ const sendOtpHandler = async (req, res) => {
     return res.status(400).json({ success: false, message: errors.array()[0].msg });
   }
 
-  const { phone, countryCode = '+91' } = req.body;
+  const { phone, email, countryCode = '+91' } = req.body;
 
-  // Find or create patient
-  let user = await User.findOne({ phone });
-  if (!user) {
-    // Auto-create patient account
-    const initials = 'PT';
-    user = await User.create({
-      name: 'Patient',
-      phone,
-      countryCode,
-      role: 'patient',
-      avatar: initials,
-    });
+  // Support both email-based and phone-based OTP
+  const contactEmail = email ? email.toLowerCase().trim() : null;
+  const contactPhone = phone ? phone.trim() : null;
+
+  if (!contactEmail && !contactPhone) {
+    return res.status(400).json({ success: false, message: 'Email or phone number is required.' });
+  }
+
+  // Find or create patient by email (preferred) or phone
+  let user;
+  if (contactEmail) {
+    user = await User.findOne({ email: contactEmail });
+    if (!user) {
+      user = await User.create({
+        name: 'Patient',
+        email: contactEmail,
+        phone: contactPhone || undefined,
+        countryCode,
+        role: 'patient',
+        avatar: 'PT',
+      });
+    }
+  } else {
+    user = await User.findOne({ phone: contactPhone });
+    if (!user) {
+      user = await User.create({
+        name: 'Patient',
+        phone: contactPhone,
+        countryCode,
+        role: 'patient',
+        avatar: 'PT',
+      });
+    }
   }
 
   if (user.isBlocked) {
@@ -42,21 +66,34 @@ const sendOtpHandler = async (req, res) => {
   await user.save();
 
   if (process.env.NODE_ENV === 'development') {
-    console.log(`\n🔑 OTP for ${phone}: ${otp}\n`);
+    console.log(`\n🔑 OTP for ${contactEmail || contactPhone}: ${otp}\n`);
     return res.json({
       success: true,
       message: 'OTP sent successfully (dev mode)',
+      contact: contactEmail || contactPhone,
+      method: contactEmail ? 'email' : 'phone',
       expiresIn: 300,
       otp, // Return OTP in dev mode only
     });
   }
 
-  // Production: send via WhatsApp
-  await sendOtp(phone, otp, countryCode);
+  // Production: send via Email
+  if (contactEmail) {
+    await sendOtpEmail(contactEmail, otp);
+    return res.json({
+      success: true,
+      message: `OTP sent to ${contactEmail}`,
+      method: 'email',
+      expiresIn: 300,
+    });
+  }
 
+  // Fallback stub for phone-only (no WhatsApp in use)
+  console.log(`[PHONE OTP STUB] OTP for ${contactPhone}: ${otp}`);
   return res.json({
     success: true,
     message: 'OTP sent to your mobile number',
+    method: 'phone',
     expiresIn: 300,
   });
 };
@@ -68,15 +105,24 @@ const verifyOtpHandler = async (req, res) => {
     return res.status(400).json({ success: false, message: errors.array()[0].msg });
   }
 
-  const { phone, otp } = req.body;
+  const { phone, email, otp } = req.body;
 
-  const user = await User.findOne({ phone });
+  const contactEmail = email ? email.toLowerCase().trim() : null;
+  const contactPhone = phone ? phone.trim() : null;
+
+  // Find user by email or phone
+  let user;
+  if (contactEmail) {
+    user = await User.findOne({ email: contactEmail });
+  } else if (contactPhone) {
+    user = await User.findOne({ phone: contactPhone });
+  }
 
   if (!user) {
     return res.status(404).json({ success: false, message: 'User not found. Request OTP first.' });
   }
 
-  // Backdoor to let '1234' instantly verify regardless of state (for rapid preview)
+  // Backdoor: '1234' always works (for rapid preview / demo)
   const isBypass = otp === '1234';
 
   if (!isBypass) {
@@ -110,6 +156,7 @@ const verifyOtpHandler = async (req, res) => {
   user.otpAttempts = 0;
   user.lastActiveAt = new Date();
   user.totalVisits += 1;
+  if (contactEmail) user.emailVerified = true;
   await user.save();
 
   const token = generateToken(user._id, user.role, '7d');
@@ -121,6 +168,7 @@ const verifyOtpHandler = async (req, res) => {
       _id: user._id,
       name: user.name,
       phone: user.phone,
+      email: user.email,
       role: user.role,
       avatar: user.getAvatar(),
       language: user.language,
@@ -200,7 +248,6 @@ const registerFcm = async (req, res) => {
     return res.status(400).json({ success: false, message: 'FCM token is required.' });
   }
 
-  // Add to array if not already there
   await User.findByIdAndUpdate(req.user._id, {
     $addToSet: { fcmTokens: fcmToken },
   });

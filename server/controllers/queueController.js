@@ -217,6 +217,72 @@ const completeToken = async (req, res) => {
   return res.json({ success: true, session: payload });
 };
 
+// ─── POST /api/queue/scan-qr ──────────────────────────────────────────────
+// Doctor scans patient QR → auto-marks that serving token as done
+const scanQrComplete = async (req, res) => {
+  const { clinicId, tokenId } = req.body;
+
+  if (!clinicId || !tokenId) {
+    return res.status(400).json({ success: false, message: 'clinicId and tokenId are required.' });
+  }
+
+  const clinic = await Clinic.findById(clinicId);
+  if (!clinic) return res.status(404).json({ success: false, message: 'Clinic not found.' });
+
+  const token = await Token.findById(tokenId);
+  if (!token) return res.status(404).json({ success: false, message: 'Token not found.' });
+
+  // Only serving tokens can be completed via QR
+  if (token.status !== 'serving') {
+    return res.status(400).json({
+      success: false,
+      message: `Token is currently "${token.status}", not serving. Cannot mark as done.`,
+    });
+  }
+
+  // Mark done
+  token.status = 'done';
+  token.completedAt = new Date();
+  await token.save();
+
+  const session = await getOrCreateSession(clinicId);
+  session.queue = session.queue.filter((t) => t.toString() !== tokenId);
+  session.doneCount += 1;
+  // Reset currentToken display
+  session.currentToken = 0;
+  session.currentTokenName = '';
+  await session.save();
+
+  await Clinic.findByIdAndUpdate(clinicId, { $inc: { totalPatientsServed: 1 } });
+
+  const updatedSession = await QueueSession.findById(session._id).populate({
+    path: 'queue',
+    populate: { path: 'patient', select: 'name' },
+  });
+
+  const payload = buildLivePayload(updatedSession, clinic, true);
+  const io = getIo(req);
+  io.to(`clinic:${clinicId}`).emit('QUEUE_UPDATED', payload);
+
+  // Notify the patient their visit is complete
+  const patientId = token.patient?.toString();
+  if (patientId) {
+    io.to(`patient:${patientId}`).emit('TOKEN_DONE', {
+      tokenNumber: token.tokenNumber,
+      displayToken: token.displayToken,
+      clinicName: clinic.name,
+      message: '✅ Your visit is complete. Thank you!',
+    });
+  }
+
+  return res.json({
+    success: true,
+    message: `Token ${token.displayToken} marked as done via QR scan.`,
+    session: payload,
+  });
+};
+
+
 // ─── POST /api/queue/cancel ────────────────────────────────────────────────
 const cancelToken = async (req, res) => {
   const { tokenId } = req.body;
@@ -317,7 +383,9 @@ module.exports = {
   callNext,
   skipPatient,
   completeToken,
+  scanQrComplete,
   cancelToken,
   closeSession,
   toggleAccepting,
 };
+

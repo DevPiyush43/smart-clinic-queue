@@ -55,18 +55,11 @@ const bookToken = async (req, res) => {
     });
   }
 
-  // Create token
+  // Create token first to get its _id, then embed id in qrData
   const tokenNumber = session.nextTokenNumber;
   const displayToken = `${clinic.tokenPrefix}${tokenNumber}`;
   const position = session.queue.length + 1;
   const estimatedWait = calcWaitTime(position, clinic.avgTimePerPatient);
-
-  const qrData = JSON.stringify({
-    displayToken,
-    clinicName: clinic.name,
-    date: new Date().toLocaleDateString('en-IN'),
-    patientName: req.user.name,
-  });
 
   const newToken = await Token.create({
     tokenNumber,
@@ -78,13 +71,26 @@ const bookToken = async (req, res) => {
     position,
     estimatedWait,
     notes: notes || '',
-    qrData,
   });
+
+
+  // Build QR data with tokenId so doctor can scan and mark done
+  const qrData = JSON.stringify({
+    tokenId: newToken._id.toString(),
+    clinicId: clinicId,
+    displayToken,
+    clinicName: clinic.name,
+    date: new Date().toLocaleDateString('en-IN'),
+    patientName: req.user.name,
+  });
+  newToken.qrData = qrData;
+  await newToken.save();
 
   session.nextTokenNumber += 1;
   session.totalBooked += 1;
   session.queue.push(newToken._id);
   await session.save();
+
 
   // Socket: emit QUEUE_UPDATED
   const io = getIo(req);
